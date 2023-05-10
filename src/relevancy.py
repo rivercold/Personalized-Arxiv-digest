@@ -16,7 +16,6 @@ import numpy as np
 import tqdm
 import utils
 
-import fire
 import pdb
 
 
@@ -100,6 +99,7 @@ def generate_relevance_score(
             logit_bias={"100257": -100},  # prevent the <|endoftext|> from being generated
             # "100265":-100, "100276":-100 for <|im_end|> and <endofprompt> token 
         )
+        print(response)
         request_duration = time.time() - request_start
 
         process_start = time.time()
@@ -108,7 +108,6 @@ def generate_relevance_score(
 
         print(f"Request {request_idx+1} took {request_duration:.2f}s")
         print(f"Post-processing took {time.time() - process_start:.2f}s")
-
     return ans_data
 
 def run_all_day_paper(
@@ -140,7 +139,3 @@ def run_all_day_paper(
 
 def main(task, **kwargs):
     globals()[task](**kwargs)
-
-
-if __name__ == "__main__":
-    fire.Fire(main)

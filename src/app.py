@@ -1,6 +1,6 @@
 import gradio as gr
 from download_new_papers import get_papers
-
+from relevancy import generate_relevance_score
 
 categories = {
     "Physics": "",
@@ -80,7 +80,15 @@ def sample(email, subject, physics_subject, subsubjects, interest):
     else:
         abbr = categories[subject]
     papers = get_papers(abbr, limit=2)
-    return f"Title: {papers[0]['title']}\nTitle: {papers[1]['title']}"
+    if interest:
+        relevancy = generate_relevance_score(
+            papers,
+            query={"interest": interest},
+            threshold_score=0,
+            num_paper_in_prompt=2)
+        return str(relevancy)
+    else:
+        return f"Title: {papers[0]['title']}\nTitle: {papers[1]['title']}"
 
 
 def change_subsubject(subject, physics_subject):
