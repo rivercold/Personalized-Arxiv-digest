@@ -114,7 +114,7 @@ def run_all_day_paper(
     date=None,
     output_dir="./data",
     model_name="gpt-3.5-turbo",
-    num_paper_in_prompt=4,
+    num_paper_in_prompt=8,
     temperature=1.0,
     top_p=1.0
 ):
