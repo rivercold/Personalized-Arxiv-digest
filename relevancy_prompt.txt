@@ -1,7 +1,0 @@
-You have been asked to read a list of 10 arxiv papers, each with title, authors and abstract.
-Given an user's specific research interest, you need to generate a relevancy score out of 10 about how each paper is relevant to the user's interest.
-Besides, you should try to give a 1-2 sentence short summary of why each paper matches this interest.
-
-The user is specifically interested in the following topics:
-1. Large language model pretraining and finetunings
-2. Multimodal machine learning
