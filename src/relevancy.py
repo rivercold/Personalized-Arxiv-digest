@@ -72,8 +72,9 @@ def process_subject_fields(subjects):
 
 def generate_relevance_score(
     all_papers,
-    query={"interest":"", "subjects":["Computation and Language (cs.CL)", "Artificial Intelligence (cs.AI)"]},
+    query,
     model_name="gpt-3.5-turbo",
+    threshold_score=8,
     num_paper_in_prompt=4,
     temperature=1.0,
     top_p=1.0,
@@ -102,15 +103,16 @@ def generate_relevance_score(
         request_duration = time.time() - request_start
 
         process_start = time.time()
-        batch_data = post_process_chat_gpt_response(prompt_papers, response)
+        batch_data = post_process_chat_gpt_response(prompt_papers, response, threshold_score=threshold_score)
         ans_data.extend(batch_data)
 
         print(f"Request {request_idx+1} took {request_duration:.2f}s")
         print(f"Post-processing took {time.time() - process_start:.2f}s")
 
+    return ans_data
 
 def run_all_day_paper(
-    query={"interest":"", "subjects":["Computation and Language (cs.CL)", "Artificial Intelligence (cs.AI)"]},
+    query={"interest":"", "subjects":["Computation and Language", "Artificial Intelligence"]},
     date=None,
     output_dir="./data",
     model_name="gpt-3.5-turbo",
@@ -131,7 +133,9 @@ def run_all_day_paper(
         if bool(set(process_subject_fields(t['subjects'])) & set(query['subjects']))
     ]
     print(f"After filtering subjects, we have {len(all_papers_in_subjects)} papers left.")
-    generate_relevance_score(all_papers_in_subjects, query, model_name, num_paper_in_prompt, temperature, top_p)
+    ans_data = generate_relevance_score(all_papers_in_subjects, query, model_name, num_paper_in_prompt, temperature, top_p)
+    
+    return ans_data
 
 
 def main(task, **kwargs):
