@@ -89,7 +89,7 @@ def generate_relevance_score(
 ):
     if date is None:
         date = datetime.today().strftime('%a, %d %b %y')
-        # string format such as Wed, 10 May 2023
+        # string format such as Wed, 10 May 23
     print ("the date for the arxiv data is: ", date)
 
     all_papers = [json.loads(l) for l in open(f"{output_dir}/{date}.jsonl", "r")]
