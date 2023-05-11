@@ -16,13 +16,13 @@ import numpy as np
 import tqdm
 import utils
 
-import fire
 import pdb
 
 
 def encode_prompt(query, prompt_papers):
     """Encode multiple prompt instructions into a single string."""
     prompt = open("./relevancy_prompt.txt").read() + "\n"
+    prompt += query['interest']
 
     for idx, task_dict in enumerate(prompt_papers):
         (title, authors, abstract) = task_dict["title"], task_dict["authors"], task_dict["abstract"]
@@ -30,9 +30,9 @@ def encode_prompt(query, prompt_papers):
             raise
         prompt += f"###\n"
         prompt += f"{idx + 1}. Title: {title}\n"
-        prompt += f"{idx + 1}. Authors:\n{authors}\n"
-        prompt += f"{idx + 1}. Abstract:\n{abstract}\n"
-    prompt += f"\n Generate response:\n"
+        prompt += f"{idx + 1}. Authors: {authors}\n"
+        prompt += f"{idx + 1}. Abstract: {abstract}\n"
+    prompt += f"\n Generate response:\n1."
     print (prompt)
     return prompt
 
@@ -42,11 +42,20 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     data = []
     if response is None:
         return []
-    score_items = response['message']['content'].split("\n\n")
+    json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
+    pattern = r"^\d+\. "
+    for line in json_items:
+        try:
+            print (json.loads(re.sub(pattern, "", line)))
+        except:
+            pdb.set_trace()
+    score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items]
+    # for string 
     # match the score 4 from the format of Relevancy score: 4/10. \n
-    scores = [int(re.findall(r"Relevancy score: (\d+)", score_item)[0]) for score_item in score_items]
+    # scores = [int(re.findall(r"Relevancy score: (\d+)", score_item)[0]) for score_item in score_items]
+    scores = [int(item["Relevancy score"]) for item in score_items]
     try:
-        assert len(score_items) == len(paper_data) == len(scores)
+        assert len(score_items) == len(paper_data)
     except:
         print ("There are some parsing issue. ")
         pdb.set_trace()
@@ -56,7 +65,9 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
             continue
         output_str = "Title: " + paper_data[idx]["title"] + "\n"
         output_str += "Authors: " + paper_data[idx]["authors"] + "\n"
-        output_str += score_items[idx].strip(f"{idx+1}.")
+        for key, value in inst.items():
+            output_str += key + ": " + value + "\n"
+        print (output_str)
         data.append(output_str)
     return data
 
@@ -67,7 +78,7 @@ def find_word_in_string(w, s):
 
 def process_subject_fields(subjects):
     all_subjects = subjects.split(";")
-    all_subjects = [s.strip() for s in all_subjects]
+    all_subjects = [s.split(" (")[0] for s in all_subjects]
     return all_subjects
 
 def generate_relevance_score(
@@ -76,12 +87,13 @@ def generate_relevance_score(
     model_name="gpt-3.5-turbo",
     threshold_score=8,
     num_paper_in_prompt=4,
-    temperature=1.0,
+    temperature=0.4,
     top_p=1.0,
 ):
     ans_data = []
-    for request_idx in tqdm.tqdm(range(0, len(all_papers), num_paper_in_prompt)):
-        prompt_papers = all_papers[request_idx:request_idx+num_paper_in_prompt]
+    request_idx = 1
+    for id in tqdm.tqdm(range(0, len(all_papers), num_paper_in_prompt)):
+        prompt_papers = all_papers[id:id+num_paper_in_prompt]
         # only sampling from the seed tasks
         prompt = encode_prompt(query, prompt_papers)
 
@@ -100,6 +112,7 @@ def generate_relevance_score(
             logit_bias={"100257": -100},  # prevent the <|endoftext|> from being generated
             # "100265":-100, "100276":-100 for <|im_end|> and <endofprompt> token 
         )
+        print ("response", response['message']['content'])
         request_duration = time.time() - request_start
 
         process_start = time.time()
@@ -114,10 +127,11 @@ def generate_relevance_score(
 def run_all_day_paper(
     query={"interest":"", "subjects":["Computation and Language", "Artificial Intelligence"]},
     date=None,
-    output_dir="./data",
+    data_dir="../data",
     model_name="gpt-3.5-turbo",
+    threshold_score=8,
     num_paper_in_prompt=8,
-    temperature=1.0,
+    temperature=0.4,
     top_p=1.0
 ):
     if date is None:
@@ -125,7 +139,7 @@ def run_all_day_paper(
         # string format such as Wed, 10 May 23
     print ("the date for the arxiv data is: ", date)
 
-    all_papers = [json.loads(l) for l in open(f"{output_dir}/{date}.jsonl", "r")]
+    all_papers = [json.loads(l) for l in open(f"{data_dir}/{date}.jsonl", "r")]
     print (f"We found {len(all_papers)}.")
 
     all_papers_in_subjects = [
@@ -133,14 +147,16 @@ def run_all_day_paper(
         if bool(set(process_subject_fields(t['subjects'])) & set(query['subjects']))
     ]
     print(f"After filtering subjects, we have {len(all_papers_in_subjects)} papers left.")
-    ans_data = generate_relevance_score(all_papers_in_subjects, query, model_name, num_paper_in_prompt, temperature, top_p)
-    
+    ans_data = generate_relevance_score(all_papers_in_subjects, query, model_name, threshold_score, num_paper_in_prompt, temperature, top_p)
+    utils.write_ans_to_file(ans_data, date, output_dir="../outputs")
     return ans_data
 
 
-def main(task, **kwargs):
-    globals()[task](**kwargs)
-
-
 if __name__ == "__main__":
-    fire.Fire(main)
+    query = {"interest":"""
+    1. Large language model pretraining and finetunings
+    2. Multimodal machine learning
+    3. Do not care about specific application, for example, information extraction, summarization, etc.
+    4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.\n""",
+    "subjects":["Computation and Language", "Artificial Intelligence"]}
+    ans_data = run_all_day_paper(query)

@@ -1,11 +1,7 @@
 You have been asked to read a list of a few arxiv papers, each with title, authors and abstract.
-Given an user's specific research interest, you need to generate a relevancy score out of 10 on how each paper is relevant to the user's interest, the higher the better. Papers will only be sent to users if the score is no less than 8.
-Besides, you should try to give a 1-2 sentence short summary of why each paper matches this interest.
-The paper should be in the same order as the input list with title, seperated by "\n\n":
-1. Relevancy score: ./10.\nReseason for this relevancy score:...\n\n 2. Relevancy score: ./10.\nReseason for this relevancy score:...\n\n
+Based on my specific research interests, elevancy score out of 10 for each paper, based on my specific research interest, with a higher score indicating greater relevance. A relevance score more than 7 will need person's attention for details.
+Additionally, please generate 1-2 sentence summary for each paper explaining why it's relevant to my research interests.
+Please keep the paper order the same as in the input list, with one json format per line. Example is:
+1. {"Relevancy score": "an integer score out of 10", "Reasons for match": "1-2 sentence short reasonings"}
 
-The user is specifically interested in the following topics:
-1. Large language model pretraining and finetunings
-2. Multimodal machine learning
-3. Do not care about specific application, for example, information extraction, summarization, etc.
-4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
+My research interests are:
