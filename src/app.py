@@ -1,6 +1,6 @@
 import gradio as gr
 from download_new_papers import get_papers
-from relevancy import generate_relevance_score
+from relevancy import generate_relevance_score, process_subject_fields
 from sendgrid.helpers.mail import Mail, Email, To, Content
 import sendgrid
 import os
@@ -78,16 +78,22 @@ def sample(email, subject, physics_subject, subsubjects, interest):
         abbr = physics_categories[subject]
     else:
         abbr = categories[subject]
-    papers = get_papers(abbr, limit=2)
+    if subsubjects:
+        papers = get_papers(abbr)
+        papers = [
+            t for t in papers
+            if bool(set(process_subject_fields(t['subjects'])) & set(subsubjects))][:4]
+    else:
+        papers = get_papers(abbr, limit=4)
     if interest:
         relevancy = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=0,
-            num_paper_in_prompt=2)
-        return str(relevancy)
+            num_paper_in_prompt=4)
+        return "\n\n".join([paper["summarized_text"] for paper in relevancy])
     else:
-        return f"Title: {papers[0]['title']}\nTitle: {papers[1]['title']}"
+        return "\n\n".join(f"Title: {paper['title']}\nAuthors: {paper['authors']}" for paper in papers)
 
 
 def change_subsubject(subject, physics_subject):
@@ -118,21 +124,27 @@ def test(email, subject, physics_subject, subsubject, interest):
         abbr = physics_categories[subject]
     else:
         abbr = categories[subject]
-    papers = get_papers(abbr, limit=2)
+    if subsubject:
+        papers = get_papers(abbr)
+        papers = [
+            t for t in papers
+            if bool(set(process_subject_fields(t['subjects'])) & set(subsubject))]
+    else:
+        papers = get_papers(abbr)
     if interest:
         relevancy = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=0,
-            num_paper_in_prompt=2)
-        body = str(relevancy)
+            num_paper_in_prompt=8)
+        body = "<br><br>".join([f'Title: <a href="https://www.google.com">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}' for paper in relevancy])
     else:
-        body = f"Title: {papers[0]['title']}\nTitle: {papers[1]['title']}"
+        body = "<br><br>".join([f'Title: <a href="https://www.google.com">{paper["title"]}</a><br>Authors: {paper["authors"]}' for paper in papers])
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("")  # Change to your verified sender
+    from_email = Email("richard.fan@petuum.com")  # Change to your verified sender
     to_email = To(email)
     subject = "arXiv digest"
-    content = Content("text/plain", body)
+    content = Content("text/html", body)
     mail = Mail(from_email, to_email, subject, content)
     mail_json = mail.get()
 
@@ -158,16 +170,16 @@ with gr.Blocks() as demo:
         physics_subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
 
 
-        interest = gr.Textbox(label="A description of what you are interested in")
-#    output = gr.Textbox(label="Output Box")
+        interest = gr.Textbox(label="A natural language description of what you are interested in. Press enter to update.")
     sample_output = gr.Textbox(label="Examples")
     subscribe_btn = gr.Button("Subscribe")
     test_btn = gr.Button("Send test email")
     #subscribe_btn.click(fn=subscribe, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
-    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=test_btn, api_name="subscribe")
+    output = gr.Textbox(label="Test email status")
+    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
     subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     physics_subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     subsubject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
-    interest.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
+    interest.submit(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
 
 demo.launch()
