@@ -1,0 +1,135 @@
+Title: Knowledge Graph Guided Semantic Evaluation of Language Models For User  Trust
+Authors: Kaushik Roy, Tarun Garg, Vedant Palit, Yuxin Zi, Vignesh Narayanan, Amit Sheth
+Relevancy score: 8
+Reasons for match: The paper evaluates the semantics encoded in the self-attention transformers by leveraging explicit knowledge graph structures, which is relevant to your interest in large language model pretraining and finetunings.
+
+Title: Explanation-based Finetuning Makes Models More Robust to Spurious Cues
+Authors: Josh Magnus Ludan, Yixuan Meng, Tai Nguyen, Saurabh Shah, Qing Lyu, Marianna Apidianaki, Chris Callison-Burch
+Relevancy score: 9
+Reasons for match: The paper proposes explanation-based finetuning as a novel and general approach to mitigate LLMs' reliance on spurious correlations, which is highly relevant to your interest in large language model pretraining and finetunings.
+
+Title: Revisiting Relation Extraction in the era of Large Language Models
+Authors: Somin Wadhwa, Silvio Amir, Byron C. Wallace
+Relevancy score: 9
+Reasons for match: The paper evaluates the performance of larger language models (GPT-3 and Flan-T5 large) on standard RE tasks under varying levels of supervision, which is highly relevant to your interest in large language model pretraining and finetunings.
+
+Title: ANALOGICAL -- A New Benchmark for Analogy of Long Text for Large  Language Models
+Authors: Thilini Wijesiriwardene, Ruwan Wickramarachchi, Bimal G. Gajera, Shreeyash Mukul Gowaikar, Chandan Gupta, Aman Chadha, Aishwarya Naresh Reganti, Amit Sheth, Amitava Das
+Relevancy score: 8
+Reasons for match: The paper presents a new benchmark to intrinsically evaluate LLMs across a taxonomy of analogies of long text, which could be relevant to your interest in large language model pretraining and finetunings.
+
+Title: Dreams Are More "Predictable'' Than You Think
+Authors: Lorenzo Bertolini
+Relevancy score: 8
+Reasons for match: This paper investigates the use of large language models to analyze dream reports and how they differ from other human-generated text strings. As someone interested in large language model pretraining, this paper is highly relevant.
+
+Title: Coherent Wave Dynamics and Language Generation of a Generative  Pre-trained Transformer
+Authors: Tao Hong
+Relevancy score: 9
+Reasons for match: This paper analyzes the hidden state and channel wave dynamics in a small GPT, focusing on the coherence of wave patterns in terms of cross-channel correlation and individual auto-correlation. As someone interested in large language model pretraining, this paper is highly relevant.
+
+Title: Knowledge-enhanced Agents for Interactive Text Games
+Authors: Prateek Chhikara, Jiarui Zhang, Filip Ilievski, Jonathan Francis, Kaixin Ma
+Relevancy score: 8
+Reasons for match: This paper proposes a framework for enabling improved functional grounding of agents in text-based games by injecting domain knowledge into learning-based agents. As someone interested in multimodal machine learning, this paper is highly relevant.
+
+Title: E2TIMT: Efficient and Effective Modal Adapter for Text Image Machine  Translation
+Authors: Cong Ma, Yaping Zhang, Mei Tu, Yang Zhao, Yu Zhou, Chengqing Zong
+Relevancy score: 8
+Reasons for match: This paper proposes an end-to-end TIMT model fully making use of the knowledge from existing OCR and MT datasets to pursue both an effective and efficient framework. As someone interested in multimodal machine learning, this paper is highly relevant.
+
+Title: Summarization with Precise Length Control
+Authors: Lesly Miculicich, Yujia Xie, Song Wang, Pengcheng He
+Relevancy score: 9
+Reasons for match: This paper presents a framework to generate summaries with precisely the specified number of tokens or sentences, while maintaining or even improving the text quality. As someone interested in large language model pretraining and finetunings, this paper is highly relevant.
+
+Title: MoT: Pre-thinking and Recalling Enable ChatGPT to Self-Improve with  Memory-of-Thoughts
+Authors: Xiaonan Li, Xipeng Qiu
+Relevancy score: 9
+Reasons for match: This paper proposes a framework to let large language models self-improve through memory of thoughts, which can significantly improve its abilities in math reasoning, commonsense reasoning, factual reasoning and natural language inference.
+
+Title: SUR-adapter: Enhancing Text-to-Image Pre-trained Diffusion Models with  Large Language Models
+Authors: Shanshan Zhong, Zhongzhan Huang, Wushao Wen, Jinghui Qin, Liang Lin
+Relevancy score: 8
+Reasons for match: This paper proposes a parameter-efficient fine-tuning approach called the Semantic Understanding and Reasoning adapter for pre-trained diffusion models to improve the capacities for narrative prompts, which is relevant to my research interests in multimodal machine learning.
+
+Title: Multi-Teacher Knowledge Distillation For Text Image Machine Translation
+Authors: Cong Ma, Yaping Zhang, Mei Tu, Yang Zhao, Yu Zhou, Chengqing Zong
+Relevancy score: 8
+Reasons for match: This paper proposes a novel Multi-Teacher Knowledge Distillation method to effectively distillate knowledge into the end-to-end TIMT model from the pipeline model, which is relevant to my research interests in multimodal machine learning.
+
+Title: Distilling Script Knowledge from Large Language Models for Constrained  Language Planning
+Authors: Siyu Yuan, Jiangjie Chen, Ziquan Fu, Xuyang Ge, Soham Shah, Charles Robert Jankowski, Deqing Yang, Yanghua Xiao
+Relevancy score: 9
+Reasons for match: This paper proposes an overgenerate-then-filter approach to improve large language models on constrained language planning, which is highly relevant to my research interests in large language model pretraining and finetuning.
+
+Title: Attack Named Entity Recognition by Entity Boundary Interference
+Authors: Yifei Yang, Hongqiu Wu, Hai Zhao
+Relevancy score: 8
+Reasons for match: This paper proposes a novel one-word modification NER attack based on a key insight, NER models are always vulnerable to the boundary position of an entity to make their decision. This is relevant to your interest in large language model pretraining and finetunings.
+
+Title: Robust Acoustic and Semantic Contextual Biasing in Neural Transducers  for Speech Recognition
+Authors: Xuandi Fu, Kanthashree Mysore Sathyendra, Ankur Gandhe, Jing Liu, Grant P. Strimel, Ross McGowan, Athanasios Mouchtaris
+Relevancy score: 9
+Reasons for match: This paper proposes a contextual biasing approach for speech recognition that employs lightweight character representations to encode fine-grained pronunciation features to improve contextual biasing guided by acoustic similarity. This is relevant to your interest in multimodal machine learning.
+
+Title: Structured Sentiment Analysis as Transition-based Dependency Parsing
+Authors: Daniel Fernández-González
+Relevancy score: 8
+Reasons for match: This paper presents the first transition-based method to address structured sentiment analysis as dependency parsing, which offers the best performance to date in practically all cases among prior dependency-based methods. This is relevant to your interest in large language model pretraining and finetunings.
+
+Title: Detection of depression on social networks using transformers and  ensembles
+Authors: Ilija Tavchioski, Marko Robnik-Šikonja, Senja Pollak
+Relevancy score: 9
+Reasons for match: This paper builds several large pre-trained language model based classifiers for depression detection from social media posts. This is relevant to your interest in large language model pretraining and finetunings and multimodal machine learning.
+
+Title: PLM-GNN: A Webpage Classification Method based on Joint Pre-trained  Language Model and Graph Neural Network
+Authors: Qiwei Lang, Jingbo Zhou, Haoyi Wang, Shiqi Lyu, Rui Zhang
+Relevancy score: 8
+Reasons for match: This paper proposes a webpage classification method based on a pre-trained language model and graph neural network, which can classify webpages in web information mining. The method performs well on the KI-04 and SWDE datasets and on practical dataset AHS for the project of scholar's homepage crawling.
+
+Title: Large Language Models Need Holistically Thought in Medical  Conversational QA
+Authors: Yixuan Weng, Bin Li, Fei Xia, Minjun Zhu, Bin Sun, Shizhu He, Kang Liu, Jun Zhao
+Relevancy score: 9
+Reasons for match: This paper proposes the Holistically Thought (HoT) method, which is designed to guide large language models to perform the diffused and focused thinking for generating high-quality medical responses. The proposed HoT method has been evaluated through automated and manual assessments in three different medical CQA datasets containing the English and Chinese languages.
+
+Title: WikiWeb2M: A Page-Level Multimodal Wikipedia Dataset
+Authors: Andrea Burns, Krishna Srinivasan, Joshua Ainslie, Geoff Brown, Bryan A. Plummer, Kate Saenko, Jianmo Ni, Mandy Guo
+Relevancy score: 8
+Reasons for match: This paper introduces the Wikipedia Webpage 2M (WikiWeb2M) suite, the first to retain the full set of images, text, and structure data available in a page. WikiWeb2M can be used for tasks like page description generation, section summarization, and contextual image captioning, which can be related to your research interests in multimodal machine learning.
+
+Title: What is the best recipe for character-level encoder-only modelling?
+Authors: Kris Cao
+Relevancy score: 9
+Reasons for match: This paper benchmarks recent progress in language understanding models that output contextualized representations at the character level. The paper explores the design space of such models, comparing architectural innovations and a variety of different pretraining objectives on a suite of evaluation tasks with a fixed training procedure in order to find the currently optimal way to build and train character-level BERT-like models.
+
+Title: Beyond Good Intentions: Reporting the Research Landscape of NLP for  Social Good
+Authors: Fernando Gonzalez, Zhijing Jin, Jad Beydoun, Bernhard Schölkopf, Tom Hope, Mrinmaya Sachan, Rada Mihalcea
+Relevancy score: 8
+Reasons for match: This paper presents a dataset and visualization workspace for NLP for Social Good, which aligns with your research interest in large language model pretraining and fine-tuning for social impact.
+
+Title: Exploiting Pseudo Image Captions for Multimodal Summarization
+Authors: Chaoya Jiang, Rui Xie, Wei Ye, Jinan Sun, Shikun Zhang
+Relevancy score: 8
+Reasons for match: This paper proposes a contrastive learning strategy for multimodal summarization, which aligns with your interest in multimodal machine learning.
+
+Title: StrAE: Autoencoding for Pre-Trained Embeddings using Explicit Structure
+Authors: Mattia Opper, Victor Prokhorov, N. Siddharth
+Relevancy score: 9
+Reasons for match: This paper explores the utility of explicit structure for representation learning in NLP, which aligns with your interest in large language model pretraining and fine-tuning.
+
+Title: DomainInv: Domain Invariant Fine Tuning and Adversarial Label Correction  For QA Domain Adaptation
+Authors: Anant Khandelwal
+Relevancy score: 8
+Reasons for match: This paper proposes an unsupervised domain adaptation method for QA, which aligns with your interest in large language model pretraining and fine-tuning for various applications.
+
+Title: An Exploration of Encoder-Decoder Approaches to Multi-Label  Classification for Legal and Biomedical Text
+Authors: Yova Kementchedjhieva, Ilias Chalkidis
+Relevancy score: 8
+Reasons for match: This paper explores the effectiveness of encoder-decoder models for multi-label classification, which is relevant to your interest in large language model pretraining and finetunings. The study also uses T5 as a pre-trained model, which is a popular language model in the field.
+
+Title: Towards Building the Federated GPT: Federated Instruction Tuning
+Authors: Jianyi Zhang, Saeed Vahidian, Martin Kuo, Chunyuan Li, Ruiyi Zhang, Guoyin Wang, Yiran Chen
+Relevancy score: 9
+Reasons for match: This paper proposes a new approach called Federated Instruction Tuning (FedIT) for instruction tuning of large language models using federated learning, which is relevant to your interest in large language model pretraining and finetunings. The study also addresses privacy concerns in obtaining high-quality instruction data, which is important in multimodal machine learning.
+

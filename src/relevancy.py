@@ -53,7 +53,13 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     # for string 
     # match the score 4 from the format of Relevancy score: 4/10. \n
     # scores = [int(re.findall(r"Relevancy score: (\d+)", score_item)[0]) for score_item in score_items]
-    scores = [int(item["Relevancy score"]) for item in score_items]
+    scores = []
+    for item in score_items:
+        temp = item["Relevancy score"]
+        if "/" in temp:
+            scores.append(int(temp.split("/")[0]))
+        else:
+            scores.append(int(temp))
     try:
         assert len(score_items) == len(paper_data)
     except:
@@ -157,5 +163,5 @@ if __name__ == "__main__":
     2. Multimodal machine learning
     3. Do not care about specific application, for example, information extraction, summarization, etc.
     4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.\n""",
-    "subjects":["Computation and Language", "Artificial Intelligence"]}
+    "subjects":["Computation and Language"]}
     ans_data = run_all_day_paper(query)
