@@ -121,7 +121,6 @@ def generate_relevance_score(
 
         print(f"Request {request_idx+1} took {request_duration:.2f}s")
         print(f"Post-processing took {time.time() - process_start:.2f}s")
-
     return ans_data
 
 def run_all_day_paper(
