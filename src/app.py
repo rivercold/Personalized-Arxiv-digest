@@ -1,6 +1,9 @@
 import gradio as gr
 from download_new_papers import get_papers
 from relevancy import generate_relevance_score
+from sendgrid.helpers.mail import Mail, Email, To, Content
+import sendgrid
+import os
 
 categories = {
     "Physics": "",
@@ -67,10 +70,6 @@ def subscribe(email, subject, physics_subject, subsubjects, interest):
         return f"Subscribing {email} to all subsubjects in {subject} ({abbr}), sorting by {interest}"
 
 
-def test(*args):
-    return subscribe(*args)
-
-
 def sample(email, subject, physics_subject, subsubjects, interest):
     if subject == "Physics":
         if isinstance(physics_subject, list):
@@ -110,6 +109,41 @@ def change_physics(subject):
         return gr.Dropdown.update(physics_categories, visible=True)
 
 
+def test(email, subject, physics_subject, subsubject, interest):
+    assert email.endswith("petuum.com")  # Safety check so we dont spam other people
+    if subject == "Physics":
+        if isinstance(physics_subject, list):
+            raise gr.Error("You must choose a physics category.")
+        subject = physics_subject
+        abbr = physics_categories[subject]
+    else:
+        abbr = categories[subject]
+    papers = get_papers(abbr, limit=2)
+    if interest:
+        relevancy = generate_relevance_score(
+            papers,
+            query={"interest": interest},
+            threshold_score=0,
+            num_paper_in_prompt=2)
+        body = str(relevancy)
+    else:
+        body = f"Title: {papers[0]['title']}\nTitle: {papers[1]['title']}"
+    sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("")  # Change to your verified sender
+    to_email = To(email)
+    subject = "arXiv digest"
+    content = Content("text/plain", body)
+    mail = Mail(from_email, to_email, subject, content)
+    mail_json = mail.get()
+
+    # Send an HTTP POST request to /mail/send
+    response = sg.client.mail.send.post(request_body=mail_json)
+    if response.status_code >= 200 and response.status_code <= 300:
+        return "Send test email: Success!"
+    else:
+        return f"Send test email: Failure ({response.status_code})"
+
+
 with gr.Blocks() as demo:
     with gr.Column():
         email = gr.Textbox(label="Email address")
@@ -125,12 +159,12 @@ with gr.Blocks() as demo:
 
 
         interest = gr.Textbox(label="A description of what you are interested in")
-    output = gr.Textbox(label="Output Box")
-    sample_output = gr.Textbox(label="Sample")
+#    output = gr.Textbox(label="Output Box")
+    sample_output = gr.Textbox(label="Examples")
     subscribe_btn = gr.Button("Subscribe")
     test_btn = gr.Button("Send test email")
-    subscribe_btn.click(fn=subscribe, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
-    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
+    #subscribe_btn.click(fn=subscribe, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
+    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=test_btn, api_name="subscribe")
     subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     physics_subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     subsubject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
