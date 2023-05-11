@@ -135,11 +135,12 @@ def test(email, subject, physics_subject, subsubject, interest):
         relevancy = generate_relevance_score(
             papers,
             query={"interest": interest},
-            threshold_score=0,
+            threshold_score=7,
             num_paper_in_prompt=8)
-        body = "<br><br>".join([f'Title: <a href="https://www.google.com">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}' for paper in relevancy])
+        print(relevancy[0].keys())
+        body = "<br><br>".join([f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}' for paper in relevancy])
     else:
-        body = "<br><br>".join([f'Title: <a href="https://www.google.com">{paper["title"]}</a><br>Authors: {paper["authors"]}' for paper in papers])
+        body = "<br><br>".join([f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}' for paper in papers])
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
     from_email = Email("richard.fan@petuum.com")  # Change to your verified sender
     to_email = To(email)
@@ -176,7 +177,7 @@ with gr.Blocks() as demo:
     test_btn = gr.Button("Send test email")
     #subscribe_btn.click(fn=subscribe, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
     output = gr.Textbox(label="Test email status")
-    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
+    test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output)
     subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     physics_subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     subsubject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
