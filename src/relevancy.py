@@ -39,7 +39,7 @@ def encode_prompt(query, prompt_papers):
 
 def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     print ("post_process_gpt_response")
-    data = []
+    selected_data = []
     if response is None:
         return []
     json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
@@ -50,9 +50,7 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
         except:
             pdb.set_trace()
     score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items]
-    # for string 
-    # match the score 4 from the format of Relevancy score: 4/10. \n
-    # scores = [int(re.findall(r"Relevancy score: (\d+)", score_item)[0]) for score_item in score_items]
+
     scores = []
     for item in score_items:
         temp = item["Relevancy score"]
@@ -65,17 +63,20 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     except:
         print ("There are some parsing issue. ")
         pdb.set_trace()
+
     for idx, inst in enumerate(score_items):
         # if the decoding stops due to length, the last example is likely truncated so we discard it
         if scores[idx] < threshold_score:
             continue
         output_str = "Title: " + paper_data[idx]["title"] + "\n"
         output_str += "Authors: " + paper_data[idx]["authors"] + "\n"
+        output_str += "Link: " + paper_data[idx]["main_page"] + "\n"
         for key, value in inst.items():
+            paper_data[idx][key] = value
             output_str += key + ": " + value + "\n"
-        print (output_str)
-        data.append(output_str)
-    return data
+        paper_data[idx]['summarized_text'] = output_str
+        selected_data.append(paper_data[idx])
+    return selected_data
 
 
 def find_word_in_string(w, s):
@@ -95,6 +96,7 @@ def generate_relevance_score(
     num_paper_in_prompt=4,
     temperature=0.4,
     top_p=1.0,
+    sorting=True
 ):
     ans_data = []
     request_idx = 1
@@ -127,6 +129,10 @@ def generate_relevance_score(
 
         print(f"Request {request_idx+1} took {request_duration:.2f}s")
         print(f"Post-processing took {time.time() - process_start:.2f}s")
+
+    if sorting:
+        ans_data = sorted(ans_data, key=lambda x: x["Relevancy score"], reverse=True)
+    
     return ans_data
 
 def run_all_day_paper(
