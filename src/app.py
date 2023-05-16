@@ -5,7 +5,7 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 import sendgrid
 import os
 
-categories = {
+topics = {
     "Physics": "",
     "Mathematics": "math",
     "Computer Science": "cs",
@@ -16,7 +16,7 @@ categories = {
     "Economics": "econ"
 }
 
-physics_categories = {
+physics_topics = {
     "Astrophysics": "astro-ph",
     "Condensed Matter": "cond-mat",
     "General Relativity and Quantum Cosmology": "gr-qc",
@@ -32,7 +32,7 @@ physics_categories = {
     "Quantum Physics": "quant-ph"
 }
 
-subcategories = {
+categories_map = {
     "Astrophysics": ["Astrophysics of Galaxies", "Cosmology and Nongalactic Astrophysics", "Earth and Planetary Astrophysics", "High Energy Astrophysical Phenomena", "Instrumentation and Methods for Astrophysics", "Solar and Stellar Astrophysics"],
     "Condensed Matter": ["Disordered Systems and Neural Networks", "Materials Science", "Mesoscale and Nanoscale Physics", "Other Condensed Matter", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics", "Strongly Correlated Electrons", "Superconductivity"],
     "General Relativity and Quantum Cosmology": ["None"],
@@ -56,37 +56,23 @@ subcategories = {
 }
 
 
-def subscribe(email, subject, physics_subject, subsubjects, interest):
+def sample(email, topic, physics_topic, categories, interest):
     if subject == "Physics":
-        if isinstance(physics_subject, list):
-            raise gr.Error("You must choose a physics category.")
-        subject = physics_subject
-        abbr = physics_categories[subject]
+        if isinstance(physics_topic, list):
+            raise gr.Error("You must choose a physics topic.")
+        topic = physics_topic
+        abbr = physics_topics[topic]
     else:
-        abbr = categories[subject]
-    if subsubjects and subsubjects != ["None"]:
-        return f"Subscribing {email} to {subsubjects} in {subject} ({abbr}), sorting by {interest}"
-    else:
-        return f"Subscribing {email} to all subsubjects in {subject} ({abbr}), sorting by {interest}"
-
-
-def sample(email, subject, physics_subject, subsubjects, interest):
-    if subject == "Physics":
-        if isinstance(physics_subject, list):
-            raise gr.Error("You must choose a physics category.")
-        subject = physics_subject
-        abbr = physics_categories[subject]
-    else:
-        abbr = categories[subject]
-    if subsubjects:
+        abbr = topics[topic]
+    if categories:
         papers = get_papers(abbr)
         papers = [
             t for t in papers
-            if bool(set(process_subject_fields(t['subjects'])) & set(subsubjects))][:4]
+            if bool(set(process_subject_fields(t['subjects'])) & set(categories))][:4]
     else:
         papers = get_papers(abbr, limit=4)
     if interest:
-        relevancy = generate_relevance_score(
+        relevancy, _ = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=0,
@@ -98,12 +84,11 @@ def sample(email, subject, physics_subject, subsubjects, interest):
 
 def change_subsubject(subject, physics_subject):
     if subject != "Physics":
-        return gr.Dropdown.update(choices=subcategories[subject], value=[], visible=True)
+        return gr.Dropdown.update(choices=categories_map[subject], value=[], visible=True)
     else:
         print(physics_subject)
         if physics_subject and not isinstance(physics_subject, list):
-            print(subcategories[physics_subject])
-            return gr.Dropdown.update(choices=subcategories[physics_subject], value=[], visible=True)
+            return gr.Dropdown.update(choices=categories_map[physics_subject], value=[], visible=True)
         else:
             return gr.Dropdown.update(choices=[], value=[], visible=False)
 
@@ -112,33 +97,34 @@ def change_physics(subject):
     if subject != "Physics":
         return gr.Dropdown.update(visible=False, value=[])
     else:
-        return gr.Dropdown.update(physics_categories, visible=True)
+        return gr.Dropdown.update(physics_topics, visible=True)
 
 
-def test(email, subject, physics_subject, subsubject, interest):
-    assert email.endswith("petuum.com")  # Safety check so we dont spam other people
-    if subject == "Physics":
-        if isinstance(physics_subject, list):
-            raise gr.Error("You must choose a physics category.")
-        subject = physics_subject
-        abbr = physics_categories[subject]
+def test(email, topic, physics_topic, categories, interest):
+    if topic == "Physics":
+        if isinstance(physics_topic, list):
+            raise gr.Error("You must choose a physics topic.")
+        topic = physics_topic
+        abbr = physics_topics[topic]
     else:
-        abbr = categories[subject]
-    if subsubject:
+        abbr = topics[topic]
+    if categories:
         papers = get_papers(abbr)
         papers = [
             t for t in papers
-            if bool(set(process_subject_fields(t['subjects'])) & set(subsubject))]
+            if bool(set(process_subject_fields(t['subjects'])) & set(categories))][:4]
     else:
-        papers = get_papers(abbr)
+        papers = get_papers(abbr, limit=4)
     if interest:
-        relevancy = generate_relevance_score(
+        relevancy, hallucination = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=7,
             num_paper_in_prompt=8)
         print(relevancy[0].keys())
         body = "<br><br>".join([f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}' for paper in relevancy])
+        if hallucination:
+            body = "Warning: the model hallucinated some papers. We have tried to remove them, but the scores may not be accurate.<br><br>" + body
     else:
         body = "<br><br>".join([f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}' for paper in papers])
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
@@ -161,11 +147,11 @@ with gr.Blocks() as demo:
     with gr.Column():
         email = gr.Textbox(label="Email address")
         subject = gr.Radio(
-            list(categories.keys()), label="Topic to subscribe to"
+            list(topics.keys()), label="Topic to subscribe to"
         )
-        physics_subject = gr.Dropdown(physics_categories, value=[], multiselect=False, label="Physics category", visible=False, info="")
+        physics_subject = gr.Dropdown(physics_topics, value=[], multiselect=False, label="Physics category", visible=False, info="")
         subsubject = gr.Dropdown(
-                [], value=[], multiselect=True, label="Sub-Subject", info="", visible=False)
+                [], value=[], multiselect=True, label="Subtopic", info="", visible=False)
         subject.change(fn=change_physics, inputs=[subject], outputs=physics_subject)
         subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
         physics_subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
@@ -173,9 +159,7 @@ with gr.Blocks() as demo:
 
         interest = gr.Textbox(label="A natural language description of what you are interested in. Press enter to update.")
     sample_output = gr.Textbox(label="Examples")
-    subscribe_btn = gr.Button("Subscribe")
-    test_btn = gr.Button("Send test email")
-    #subscribe_btn.click(fn=subscribe, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output, api_name="subscribe")
+    test_btn = gr.Button("Send email")
     output = gr.Textbox(label="Test email status")
     test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest], outputs=output)
     subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)

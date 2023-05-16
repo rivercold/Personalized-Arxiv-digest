@@ -1,6 +1,8 @@
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
 
+from datetime import date
+
 import argparse
 import yaml
 import os
@@ -123,10 +125,9 @@ if __name__ == "__main__":
         sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         from_email = Email(from_email)  # Change to your verified sender
         to_email = To(to_email)
-        subject = "arXiv digest"
+        subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
         content = Content("text/html", body)
         mail = Mail(from_email, to_email, subject, content)
-        print(mail)
         mail_json = mail.get()
 
         # Send an HTTP POST request to /mail/send
