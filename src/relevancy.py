@@ -16,8 +16,6 @@ import numpy as np
 import tqdm
 import utils
 
-import pdb
-
 
 def encode_prompt(query, prompt_papers):
     """Encode multiple prompt instructions into a single string."""
@@ -44,11 +42,6 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
         return []
     json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
     pattern = r"^\d+\. "
-    for line in json_items:
-        try:
-            print (json.loads(re.sub(pattern, "", line)))
-        except:
-            pdb.set_trace()
     score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items]
 
     scores = []
@@ -61,8 +54,7 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     try:
         assert len(score_items) == len(paper_data)
     except:
-        print ("There are some parsing issue. ")
-        pdb.set_trace()
+        raise RuntimeError("There are some parsing issue. ")
 
     for idx, inst in enumerate(score_items):
         # if the decoding stops due to length, the last example is likely truncated so we discard it
