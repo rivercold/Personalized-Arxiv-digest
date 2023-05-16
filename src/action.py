@@ -109,7 +109,8 @@ if __name__ == "__main__":
     with open(args.config, "r") as f:
         config = yaml.safe_load(f)
     if "OPENAI_API_KEY" not in os.environ:
-        raise RuntimeError("No openai api key found")
+        raise RuntimeError(f"No openai api key found in keys: {list(os.environ.keys())}")
+
     topic = config["topic"]
     categories = config["categories"]
     from_email = config.get("from_email", os.environ.get("FROM_EMAIL"))
