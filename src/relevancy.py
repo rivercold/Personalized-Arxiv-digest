@@ -21,7 +21,7 @@ import pdb
 
 def encode_prompt(query, prompt_papers):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("./relevancy_prompt.txt").read() + "\n"
+    prompt = open("src/relevancy_prompt.txt").read() + "\n"
     prompt += query['interest']
 
     for idx, task_dict in enumerate(prompt_papers):
