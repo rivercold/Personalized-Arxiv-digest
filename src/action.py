@@ -86,15 +86,16 @@ def generate_body(topic, categories, interest, threshold):
     else:
         papers = get_papers(abbr)
     if interest:
-        relevancy = generate_relevance_score(
+        relevancy, hallucination = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=threshold,
             num_paper_in_prompt=8)
-        print(relevancy[0].keys())
         body = "<br><br>".join(
             [f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}'
              for paper in relevancy])
+        if hallucination:
+            body = "Warning: the model hallucinated some papers. We have tried to remove them, but the scores may not be accurate.<br><br>" + body
     else:
         body = "<br><br>".join(
             [f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}'
@@ -113,8 +114,8 @@ if __name__ == "__main__":
 
     topic = config["topic"]
     categories = config["categories"]
-    from_email = config.get("from_email", os.environ.get("FROM_EMAIL"))
-    to_email = config.get("to_email", os.environ.get("TO_EMAIL"))
+    from_email = config.get("from_email") or os.environ.get("FROM_EMAIL")
+    to_email = config.get("to_email") or os.environ.get("TO_EMAIL")
     threshold = config["threshold"]
     interest = config["interest"]
     with open("body.html", "w") as f:
@@ -125,6 +126,7 @@ if __name__ == "__main__":
         subject = "arXiv digest"
         content = Content("text/html", body)
         mail = Mail(from_email, to_email, subject, content)
+        print(mail)
         mail_json = mail.get()
 
         # Send an HTTP POST request to /mail/send
@@ -132,4 +134,4 @@ if __name__ == "__main__":
         if response.status_code >= 200 and response.status_code <= 300:
             print("Send test email: Success!")
         else:
-            print("Send test email: Failure ({response.status_code})")
+            print("Send test email: Failure ({response.status_code}, {response.text})")
