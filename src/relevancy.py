@@ -31,19 +31,23 @@ def encode_prompt(query, prompt_papers):
         prompt += f"{idx + 1}. Authors: {authors}\n"
         prompt += f"{idx + 1}. Abstract: {abstract}\n"
     prompt += f"\n Generate response:\n1."
-    print (prompt)
+    print(prompt)
     return prompt
 
 
 def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
-    print ("post_process_gpt_response")
     selected_data = []
     if response is None:
         return []
     json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
     pattern = r"^\d+\. "
-    score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items]
-
+    import pprint
+    try:
+        score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items if "relevancy score" in line.lower()]
+    except Exception:
+        pprint.pprint([re.sub(pattern, "", line) for line in json_items if "relevancy score" in line.lower()])
+        raise RuntimeError("failed")
+    pprint.pprint(score_items)
     scores = []
     for item in score_items:
         temp = item["Relevancy score"]
@@ -51,10 +55,11 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
             scores.append(int(temp.split("/")[0]))
         else:
             scores.append(int(temp))
-    try:
-        assert len(score_items) == len(paper_data)
-    except:
-        raise RuntimeError("There are some parsing issue. ")
+    if len(score_items) != len(paper_data):
+        score_items = score_items[:len(paper_data)]
+        hallucination = True
+    else:
+        hallucination = False
 
     for idx, inst in enumerate(score_items):
         # if the decoding stops due to length, the last example is likely truncated so we discard it
@@ -68,7 +73,7 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
             output_str += key + ": " + value + "\n"
         paper_data[idx]['summarized_text'] = output_str
         selected_data.append(paper_data[idx])
-    return selected_data
+    return selected_data, hallucination
 
 
 def find_word_in_string(w, s):
@@ -92,6 +97,7 @@ def generate_relevance_score(
 ):
     ans_data = []
     request_idx = 1
+    hallucination = False
     for id in tqdm.tqdm(range(0, len(all_papers), num_paper_in_prompt)):
         prompt_papers = all_papers[id:id+num_paper_in_prompt]
         # only sampling from the seed tasks
@@ -116,7 +122,8 @@ def generate_relevance_score(
         request_duration = time.time() - request_start
 
         process_start = time.time()
-        batch_data = post_process_chat_gpt_response(prompt_papers, response, threshold_score=threshold_score)
+        batch_data, hallu = post_process_chat_gpt_response(prompt_papers, response, threshold_score=threshold_score)
+        hallucination = hallucination or hallu
         ans_data.extend(batch_data)
 
         print(f"Request {request_idx+1} took {request_duration:.2f}s")
@@ -125,7 +132,7 @@ def generate_relevance_score(
     if sorting:
         ans_data = sorted(ans_data, key=lambda x: x["Relevancy score"], reverse=True)
     
-    return ans_data
+    return ans_data, hallucination
 
 def run_all_day_paper(
     query={"interest":"", "subjects":["Computation and Language", "Artificial Intelligence"]},
