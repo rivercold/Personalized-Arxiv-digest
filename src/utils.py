@@ -12,7 +12,6 @@ import openai
 import tqdm
 from openai import openai_object
 import copy
-import pdb
 
 StrOrOpenAIObject = Union[str, openai_object.OpenAIObject]
 
@@ -36,7 +35,7 @@ class OpenAIDecodingArguments(object):
 
 
 def openai_completion(
-    prompts: Union[str, Sequence[str], Sequence[dict[str, str]], dict[str, str]],
+    prompts, #: Union[str, Sequence[str], Sequence[dict[str, str]], dict[str, str]],
     decoding_args: OpenAIDecodingArguments,
     model_name="text-davinci-003",
     sleep_time=2,
