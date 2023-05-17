@@ -18,7 +18,7 @@ This repository provides a way to have this daily digest sorted by relevance via
 The recommended way to get started using this repository is to:
 
 1. Fork the repository
-2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 6:25AM, then also modify the file `.github/workflows/daily_pipeline.yaml`
+2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 1:25PM UTC, then also modify the file `.github/workflows/daily_pipeline.yaml`
 3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys) (optional, if you want the action to email you)
 5. Set the following secrets:
