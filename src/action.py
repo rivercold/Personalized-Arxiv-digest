@@ -120,7 +120,7 @@ if __name__ == "__main__":
     to_email = config.get("to_email") or os.environ.get("TO_EMAIL")
     threshold = config["threshold"]
     interest = config["interest"]
-    with open("body.html", "w") as f:
+    with open("digest.html", "w") as f:
         body = generate_body(topic, categories, interest, threshold)
         f.write(body)
         if os.environ.get('SENDGRID_API_KEY', None):

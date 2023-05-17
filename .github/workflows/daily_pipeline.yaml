@@ -36,4 +36,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: digest.html
-        path: body.html
+        path: digest.html

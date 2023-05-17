@@ -30,4 +30,4 @@ threshold: 7
 #
 # This can be empty, which just return a full list of papers with no judgement or filtering,
 # in whatever order arXiv responds with.
-interest: "policy gradients"
+interest: "large language models"
