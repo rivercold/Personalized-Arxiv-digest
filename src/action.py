@@ -122,17 +122,21 @@ if __name__ == "__main__":
     interest = config["interest"]
     with open("body.html", "w") as f:
         body = generate_body(topic, categories, interest, threshold)
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-        from_email = Email(from_email)  # Change to your verified sender
-        to_email = To(to_email)
-        subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
-        content = Content("text/html", body)
-        mail = Mail(from_email, to_email, subject, content)
-        mail_json = mail.get()
+        f.write(body)
+        if os.environ.get('SENDGRID_API_KEY', None):
+            sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+            from_email = Email(from_email)  # Change to your verified sender
+            to_email = To(to_email)
+            subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
+            content = Content("text/html", body)
+            mail = Mail(from_email, to_email, subject, content)
+            mail_json = mail.get()
 
-        # Send an HTTP POST request to /mail/send
-        response = sg.client.mail.send.post(request_body=mail_json)
-        if response.status_code >= 200 and response.status_code <= 300:
-            print("Send test email: Success!")
+            # Send an HTTP POST request to /mail/send
+            response = sg.client.mail.send.post(request_body=mail_json)
+            if response.status_code >= 200 and response.status_code <= 300:
+                print("Send test email: Success!")
+            else:
+                print("Send test email: Failure ({response.status_code}, {response.text})")
         else:
-            print("Send test email: Failure ({response.status_code}, {response.text})")
+            print("No sendgrid api key found. Skipping email")
