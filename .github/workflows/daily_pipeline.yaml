@@ -37,3 +37,11 @@ jobs:
       with:
         name: digest.html
         path: digest.html
+    - name: email 
+      runs-on: ubuntu-latest
+      steps:
+        - uses: octokit/request-action@v2.x
+          with:
+            route:  GET /repos/{owner}/{repo}/main 
+        - run: |
+            head digest.html 
